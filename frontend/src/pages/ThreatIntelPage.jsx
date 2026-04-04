@@ -14,7 +14,6 @@ const MITRE_MAP = {
   script_kiddie:       {id:"T1595",name:"Active Scanning",tactic:"Reconnaissance"},
 };
 
-const FLAG_MAP = {"Russia":"🇷🇺","China":"🇨🇳","USA":"🇺🇸","Romania":"🇷🇴","Brazil":"🇧🇷","Iran":"🇮🇷","Nigeria":"🇳🇬","India":"🇮🇳","Germany":"🇩🇪","Ukraine":"🇺🇦"};
 const TACTIC_COLORS = {"Discovery":"var(--blue)","Credential Access":"var(--amber)","Initial Access":"var(--red)","Privilege Escalation":"#ff2222","Execution":"var(--purple)","Exfiltration":"#ff6600","Persistence":"#cc00ff","Reconnaissance":"var(--cyan)"};
 
 export default function ThreatIntelPage() {
@@ -24,7 +23,7 @@ export default function ThreatIntelPage() {
   const ipCounts = useMemo(()=>{
     const m = {};
     attacks.forEach(a=>{
-      if(!m[a.ip]) m[a.ip]={ip:a.ip,count:0,country:a.country,sevs:{},intents:{}};
+      if(!m[a.ip]) m[a.ip]={ip:a.ip,count:0,sevs:{},intents:{}};
       m[a.ip].count++;
       m[a.ip].sevs[a.severity]=(m[a.ip].sevs[a.severity]||0)+1;
       m[a.ip].intents[a.intent]=(m[a.ip].intents[a.intent]||0)+1;
@@ -48,7 +47,7 @@ export default function ThreatIntelPage() {
     const sessions = {};
     attacks.forEach(a=>{
       const key = a.ip;
-      if(!sessions[key]) sessions[key]={ip:a.ip,country:a.country,events:[],intents:new Set(),maxSev:"low"};
+      if(!sessions[key]) sessions[key]={ip:a.ip,events:[],intents:new Set(),maxSev:"low"};
       sessions[key].events.push(a);
       sessions[key].intents.add(a.intent);
       const rank={critical:4,high:3,medium:2,low:1};
@@ -110,7 +109,7 @@ export default function ThreatIntelPage() {
                     <div style={{flex:1}}>
                       <div className="attacker-ip">{ip.ip}</div>
                       <div style={{fontSize:10,color:"var(--text3)"}}>
-                        {FLAG_MAP[ip.country?.country]||"🌐"} {ip.country?.country} · {topIntent.replace(/_/g," ")}
+                        {topIntent.replace(/_/g," ")}
                       </div>
                     </div>
                     <div style={{textAlign:"right"}}>
@@ -138,7 +137,6 @@ export default function ThreatIntelPage() {
                 <div key={session.ip} style={{background:"var(--bg3)",border:"1px solid var(--border)",borderRadius:8,padding:"10px 14px"}}>
                   <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:8}}>
                     <span className="ip-tag text-mono">{session.ip}</span>
-                    <span style={{fontSize:11,color:"var(--text2)"}}>{FLAG_MAP[session.country?.country]||"🌐"} {session.country?.country}</span>
                     <span className={`sev-badge sev-${session.maxSev}`}>{session.maxSev}</span>
                     <span style={{marginLeft:"auto",fontSize:11,color:"var(--text2)",fontFamily:"var(--mono)"}}>{session.events.length} commands</span>
                   </div>
@@ -169,7 +167,7 @@ export default function ThreatIntelPage() {
           </div>
           <div className="attack-table-wrap" style={{maxHeight:300}}>
             <table className="attack-table">
-              <thead><tr><th>IP Address</th><th>Country</th><th>Total Events</th><th>Critical</th><th>Top Intent</th><th>Last Seen</th><th>Threat Score</th></tr></thead>
+              <thead><tr><th>IP Address</th><th>Total Events</th><th>Critical</th><th>Top Intent</th><th>Last Seen</th><th>Threat Score</th></tr></thead>
               <tbody>
                 {ipCounts.map(ipData=>{
                   const topIntent=Object.entries(ipData.intents).sort((a,b)=>b[1]-a[1])[0]?.[0]||"";
@@ -180,7 +178,6 @@ export default function ThreatIntelPage() {
                   return (
                     <tr key={ipData.ip}>
                       <td><span className="ip-tag">{ipData.ip}</span></td>
-                      <td><span className="text-xs">{FLAG_MAP[ipData.country?.country]||"🌐"} {ipData.country?.country}</span></td>
                       <td><span className="text-mono">{ipData.count}</span></td>
                       <td><span className="text-mono" style={{color:critN>0?"var(--red)":"var(--text3)"}}>{critN}</span></td>
                       <td><span className="text-xs">{topIntent.replace(/_/g," ")}</span></td>

@@ -2,18 +2,12 @@ import { useAttacks } from "../App";
 import StatCards from "../components/StatCards";
 import AttackFeed from "../components/AttackFeed";
 import IntentChart from "../components/IntentChart";
-import AttackMap from "../components/AttackMap";
 import ServiceBreakdown from "../components/ServiceBreakdown";
 import TimelineChart from "../components/TimelineChart";
-
-const FLAG_MAP = {"Russia":"🇷🇺","China":"🇨🇳","USA":"🇺🇸","Romania":"🇷🇴","Brazil":"🇧🇷","Iran":"🇮🇷","Nigeria":"🇳🇬","India":"🇮🇳","Germany":"🇩🇪","Ukraine":"🇺🇦"};
 
 export default function Dashboard() {
   const { connected, attacks, stats, aiSuggestions, manualReport, reportGenerating } = useAttacks();
 
-  const byCountry = stats?.by_country || {};
-  const topCountries = Object.entries(byCountry).sort((a,b)=>b[1]-a[1]).slice(0,6);
-  const total = Object.values(byCountry).reduce((a,b)=>a+b,0)||1;
   const criticals = attacks.filter(a=>a.severity==="critical").length;
   const mitre = stats?.by_intent ? Object.entries(stats.by_intent).slice(0,4) : [];
 
@@ -70,24 +64,6 @@ export default function Dashboard() {
               </div>
             </div>
 
-            {/* Top Countries */}
-            <div className="panel">
-              <div className="panel-header">
-                <div className="panel-title"><div className="panel-title-dot" style={{background:"var(--blue)"}}/>Origin Countries</div>
-              </div>
-              <div className="panel-body-sm">
-                {topCountries.map(([country,count],i)=>(
-                  <div key={country} className="geo-row">
-                    <span className="geo-flag">{FLAG_MAP[country]||"🌐"}</span>
-                    <span className="geo-country">{country}</span>
-                    <div className="geo-bar-wrap"><div className="geo-bar-fill" style={{width:`${(count/total)*100}%`}}/></div>
-                    <span className="geo-count">{count}</span>
-                  </div>
-                ))}
-                {topCountries.length===0&&<div className="chart-empty" style={{height:80}}>No geo data</div>}
-              </div>
-            </div>
-
             {/* Service breakdown */}
             <div className="panel">
               <div className="panel-header">
@@ -129,14 +105,6 @@ export default function Dashboard() {
                 <div className="panel-title"><div className="panel-title-dot" style={{background:"var(--red)"}}/>Attack Intents</div>
               </div>
               <div className="panel-body"><IntentChart/></div>
-            </div>
-
-            {/* Attack Map */}
-            <div className="panel">
-              <div className="panel-header">
-                <div className="panel-title"><div className="panel-title-dot" style={{background:"var(--cyan)"}}/>Origin Map</div>
-              </div>
-              <div className="panel-body-0"><AttackMap/></div>
             </div>
 
             {/* MITRE Quick View */}

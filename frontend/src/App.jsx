@@ -133,7 +133,7 @@ export default function App() {
     const s = [];
     if ((severities.critical||0)>3) s.push({id:"c1",priority:"CRITICAL",icon:"🚨",title:"Multiple critical attacks",description:`${severities.critical} critical events. Activate incident response protocol.`,action:"View Critical",color:"#ff3333"});
     if (intents.sql_injection>2) s.push({id:"s1",priority:"HIGH",icon:"⛁",title:"SQL Injection campaign",description:`${intents.sql_injection} SQLi attempts. Deploy WAF and audit DB logs.`,action:"View SQLi",color:"#ff9900"});
-    if (intents.brute_force>4) s.push({id:"b1",priority:"HIGH",icon:"⚡",title:"Brute force attack sustained",description:`${intents.brute_force} BF attempts. Enable lockout and geo-block attackers.`,action:"Block IPs",color:"#ff9900"});
+    if (intents.brute_force>4) s.push({id:"b1",priority:"HIGH",icon:"⚡",title:"Brute force attack sustained",description:`${intents.brute_force} BF attempts. Enable lockout after 5 failures and enforce MFA.`,action:"Block IPs",color:"#ff9900"});
     if (intents.malware_deploy>1) s.push({id:"m1",priority:"CRITICAL",icon:"☣",title:"Malware deployment attempts",description:`${intents.malware_deploy} deploy attempts. Check egress firewall immediately.`,action:"Firewall",color:"#cc00ff"});
     if ((services.SSH||0)>10) s.push({id:"sh1",priority:"MEDIUM",icon:"🔑",title:"SSH heavily targeted",description:`${services.SSH} SSH probes. Move production SSH to non-standard port.`,action:"SSH Config",color:"#ffcc33"});
     if (intents.apt>1) s.push({id:"a1",priority:"CRITICAL",icon:"◉",title:"APT persistence detected",description:`${intents.apt} APT-style commands. Attacker establishing backdoor.`,action:"APT Events",color:"#ff3333"});

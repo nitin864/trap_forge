@@ -14,7 +14,6 @@ export default function AnalyticsPage() {
   const intentData = Object.entries(stats?.by_intent||{}).map(([k,v])=>({name:k.replace(/_/g," "),value:v,raw:k})).sort((a,b)=>b.value-a.value);
   const svcData    = Object.entries(stats?.by_service||{}).map(([k,v])=>({name:k,value:v})).sort((a,b)=>b.value-a.value);
   const sevData    = Object.entries(stats?.by_severity||{}).map(([k,v])=>({name:k,value:v}));
-  const countryData= Object.entries(stats?.by_country||{}).map(([k,v])=>({name:k,value:v})).sort((a,b)=>b.value-a.value).slice(0,8);
   const timeline   = stats?.timeline||[];
 
   // Build hourly breakdown from attacks
@@ -60,7 +59,7 @@ export default function AnalyticsPage() {
       <div className="page-body">
         {/* Tabs */}
         <div style={{display:"flex",gap:4,marginBottom:20,borderBottom:"1px solid var(--border)",paddingBottom:0}}>
-          {["overview","intent","severity","geography","comparison"].map(t=>(
+          {["overview","intent","severity","comparison"].map(t=>(
             <button key={t} onClick={()=>setTab(t)}
               className={`analytics-tab${tab===t?" active":""}`}
               style={{textTransform:"capitalize"}}>
@@ -188,23 +187,6 @@ export default function AnalyticsPage() {
                   </ResponsiveContainer>
                 </div>
               </div>
-            </div>
-          </div>
-        )}
-
-        {tab==="geography" && (
-          <div className="panel">
-            <div className="panel-header"><div className="panel-title"><div className="panel-title-dot" style={{background:"var(--blue)"}}/>Top Attack Origins</div></div>
-            <div className="panel-body">
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={countryData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#1a2d42" vertical={false}/>
-                  <XAxis dataKey="name" tick={{fontSize:10,fill:"#7a8fa5"}} axisLine={false} tickLine={false}/>
-                  <YAxis tick={{fontSize:10,fill:"#7a8fa5"}} axisLine={false} tickLine={false}/>
-                  <Tooltip {...TT_STYLE}/>
-                  <Bar dataKey="value" fill="#2d9cff" radius={[4,4,0,0]}/>
-                </BarChart>
-              </ResponsiveContainer>
             </div>
           </div>
         )}

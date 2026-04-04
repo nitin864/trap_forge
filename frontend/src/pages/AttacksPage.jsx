@@ -79,7 +79,7 @@ export default function AttacksPage() {
             <div className="attack-table-wrap" style={{maxHeight:"calc(100vh - 250px)"}}>
               <table className="attack-table">
                 <thead>
-                  <tr><th>Time</th><th>IP</th><th>Country</th><th>Service</th><th>Intent</th><th>Sev</th><th>Conf</th><th>Command</th></tr>
+                  <tr><th>Time</th><th>IP</th><th>Service</th><th>Intent</th><th>Sev</th><th>Conf</th><th>Command</th></tr>
                 </thead>
                 <tbody>
                   {filtered.slice(0,200).map((a,i)=>(
@@ -87,7 +87,6 @@ export default function AttacksPage() {
                       style={{cursor:"pointer",background:selected?.id===a.id?"rgba(0,232,122,0.04)":""}}>
                       <td><span className="text-mono text-xs text-muted">{a.timestamp?.slice(11,19)||"—"}</span></td>
                       <td><span className="ip-tag">{a.ip}</span></td>
-                      <td><span className="text-xs text-muted">{a.country?.flag} {a.country?.country}</span></td>
                       <td><span className={`svc-tag svc-${a.service}`}>{a.service}</span></td>
                       <td><div className="intent-cell"><span className="intent-icon">{INTENT_ICONS[a.intent]||"·"}</span><span className="text-xs">{(a.intent||"").replace(/_/g," ")}</span></div></td>
                       <td><span className={`sev-badge sev-${a.severity}`}>{a.severity}</span></td>
@@ -147,14 +146,6 @@ export default function AttacksPage() {
                     <div>
                       <div className="text-xs text-muted mb-4">Port</div>
                       <span className="text-mono text-xs">{selected.port}</span>
-                    </div>
-                    <div>
-                      <div className="text-xs text-muted mb-4">Country</div>
-                      <div className="text-xs">{selected.country?.flag} {selected.country?.country}</div>
-                    </div>
-                    <div>
-                      <div className="text-xs text-muted mb-4">City</div>
-                      <div className="text-xs text-muted">{selected.country?.city || "—"}</div>
                     </div>
                     <div>
                       <div className="text-xs text-muted mb-4">Confidence</div>

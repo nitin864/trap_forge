@@ -13,7 +13,7 @@ export default function AlertToast() {
             <span className="toast-ip">{a.ip}</span>
           </div>
           <div className="toast-cmd">{(a.command||"").slice(0,60)}</div>
-          <div className="toast-meta">{a.country?.flag} {a.country?.country} · {a.service} · port {a.port}</div>
+          <div className="toast-meta">{a.service} · port {a.port}</div>
         </div>
       ))}
     </div>

