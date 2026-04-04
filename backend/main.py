@@ -333,7 +333,7 @@ async def startup():
         t.start()
 
     # Start demo attacker for live dashboard demo
-    demo_thread = threading.Thread(target=run_demo_attacker, daemon=True)
+    demo_thread = threading.Thread(target=run_demo_attacker,daemon=True)
     demo_thread.start()
 
     print("[TrapForge] All honeypots active. Demo attacker running.")

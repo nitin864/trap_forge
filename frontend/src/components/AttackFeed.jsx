@@ -1,73 +1,47 @@
 import { useAttacks } from "../App";
-import SeverityBadge from "./SeverityBadge";
 
-const INTENT_ICONS = {
-  recon: "◎",
-  brute_force: "⚡",
-  credential_theft: "⚿",
-  sql_injection: "⛁",
-  privilege_escalation: "▲",
-  malware_deploy: "☣",
-  data_exfil: "◈",
-  xss: "✕",
-  apt: "◉",
-  script_kiddie: "◇",
-};
+const INTENT_ICONS = { recon:"◎",brute_force:"⚡",credential_theft:"⚿",sql_injection:"⛁",privilege_escalation:"▲",malware_deploy:"☣",data_exfil:"◈",xss:"✕",apt:"◉",script_kiddie:"◇" };
 
-const SERVICE_COLORS = {
-  SSH:   "#33aaff",
-  FTP:   "#aa88ff",
-  HTTP:  "#ffcc33",
-  MySQL: "#ff6699",
-  SMTP:  "#33ffcc",
-};
-
-export default function AttackFeed() {
+export default function AttackFeed({ limit=80 }) {
   const { attacks } = useAttacks();
-
   return (
-    <div className="attack-feed">
-      <div className="feed-header-row">
-        <span>Time</span>
-        <span>IP</span>
-        <span>Svc</span>
-        <span>Intent</span>
-        <span>Command</span>
-        <span>Conf.</span>
-        <span>Sev.</span>
-      </div>
-      <div className="feed-rows">
-        {attacks.slice(0, 80).map((a, i) => (
-          <div
-            key={a.id}
-            className={`feed-row ${i === 0 ? "feed-row-new" : ""}`}
-          >
-            <span className="feed-time">
-              {a.timestamp ? a.timestamp.slice(11, 19) : "--:--:--"}
-            </span>
-            <span className="feed-ip">{a.ip}</span>
-            <span
-              className="feed-svc"
-              style={{ color: SERVICE_COLORS[a.service] || "#aaa" }}
-            >
-              {a.service}
-            </span>
-            <span className="feed-intent">
-              <span className="intent-icon">{INTENT_ICONS[a.intent] || "·"}</span>
-              {a.intent?.replace(/_/g, " ")}
-            </span>
-            <span className="feed-cmd" title={a.command}>
-              {a.command?.slice(0, 32)}{a.command?.length > 32 ? "…" : ""}
-            </span>
-            <span className="feed-conf">
-              {(a.confidence * 100).toFixed(0)}%
-            </span>
-            <span>
-              <SeverityBadge level={a.severity} />
-            </span>
-          </div>
-        ))}
-      </div>
+    <div className="attack-table-wrap">
+      <table className="attack-table">
+        <thead>
+          <tr>
+            <th>Time</th>
+            <th>IP Address</th>
+            <th>Service</th>
+            <th>Intent</th>
+            <th>Severity</th>
+            <th>Conf</th>
+            <th>Command</th>
+          </tr>
+        </thead>
+        <tbody>
+          {attacks.slice(0, limit).map((a, i) => (
+            <tr key={a.id} className={i === 0 ? "row-new" : ""}>
+              <td><span className="text-mono text-xs text-muted">{a.timestamp?.slice(11,19) || "--:--:--"}</span></td>
+              <td><span className="ip-tag">{a.ip}</span></td>
+              <td><span className={`svc-tag svc-${a.service}`}>{a.service}</span></td>
+              <td>
+                <div className="intent-cell">
+                  <span className="intent-icon">{INTENT_ICONS[a.intent] || "·"}</span>
+                  <span className="text-xs">{(a.intent||"").replace(/_/g," ")}</span>
+                </div>
+              </td>
+              <td><span className={`sev-badge sev-${a.severity}`}>{a.severity}</span></td>
+              <td>
+                <div className="conf-bar-wrap">
+                  <div className="conf-bar"><div className="conf-bar-fill" style={{width:`${(a.confidence||0)*100}%`}} /></div>
+                  <span className="text-mono text-xs text-muted">{((a.confidence||0)*100).toFixed(0)}%</span>
+                </div>
+              </td>
+              <td><span className="cmd-cell" title={a.command}>{(a.command||"").slice(0,40)}{(a.command||"").length>40?"…":""}</span></td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }
