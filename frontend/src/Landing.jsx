@@ -334,7 +334,7 @@ function Hero() {
                         Deploy TrapForge →
                     </motion.a>
                     <motion.button
-                        onClick={()=> navigate("/dashboard")}
+                        onClick={() => navigate("/login")}
                         whileHover={{ borderColor: "#fff", color: "#fff" }}
                         style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 13, padding: "12px 24px", background: "transparent", border: "1px solid #2a2a2a", color: "#6b7280", borderRadius: 4, textDecoration: "none", display: "inline-block", transition: "border-color 0.15s, color 0.15s" }}
                     >

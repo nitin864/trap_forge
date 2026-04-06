@@ -139,6 +139,7 @@ async def llm_status():
     }
 
 
+
 @app.post("/api/narrate")
 async def narrate_attack(payload: dict):
     events = payload.get("events", [])
@@ -407,7 +408,7 @@ async def startup():
         t.start()
 
     # FIX: target= was missing — demo attacker never ran before
-    demo_thread = threading.Thread( target=run_demo_attacker,daemon=True)
+    demo_thread = threading.Thread(daemon=True)
     demo_thread.start()
 
     print("[TrapForge] All honeypots active. Demo attacker running.")
