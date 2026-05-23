@@ -20,7 +20,7 @@ export default function LoginPage() {
     setError("");
 
     try {
-      const res = await fetch("http://localhost:5000/api/auth/login", {
+      const res = await fetch("http://43.205.138.66:5000/api/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
