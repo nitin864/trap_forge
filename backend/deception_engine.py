@@ -1,9 +1,4 @@
-"""
-TrapForge Deception Engine
-Generates convincing fake service banners and responses.
-Uses Grok (xAI) via OpenAI-compatible API for dynamic deception;
-falls back to rule-based templates if XAI_API_KEY is not set.
-"""
+
 
 import os
 import random

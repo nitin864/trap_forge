@@ -1,8 +1,4 @@
-"""
-TrapForge Attack Store
-In-memory storage with stats aggregation.
-Replace with Redis or SQLite for persistence.
-"""
+
 
 from collections import defaultdict, deque
 from datetime import datetime
