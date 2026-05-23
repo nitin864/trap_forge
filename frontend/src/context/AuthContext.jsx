@@ -1,37 +1,46 @@
-import { createContext, useContext, useState, useCallback } from "react";
 
-const AuthContext = createContext(null);
+import { createContext, useContext, useState, useEffect } from "react";
 
-const VALID_USER = "admin";
-const VALID_PASS = "trapforge2025";
-const STORAGE_KEY = "trapforge_auth";
+const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
-    const [isAuthenticated, setIsAuthenticated] = useState(
-        () => localStorage.getItem(STORAGE_KEY) === "true"
-    );
+  const [user, setUser] = useState(null);
 
-    const login = useCallback((username, password) => {
-        if (username === VALID_USER && password === VALID_PASS) {
-            localStorage.setItem(STORAGE_KEY, "true");
-            setIsAuthenticated(true);
-            return true;
-        }
-        return false;
-    }, []);
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) setUser(JSON.parse(storedUser));
+  }, []);
 
-    const logout = useCallback(() => {
-        localStorage.removeItem(STORAGE_KEY);
-        setIsAuthenticated(false);
-    }, []);
+  const login = async (email, password) => {
+    const res = await fetch("http://localhost:5000/api/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ email, password }),
+    });
 
-    return (
-        <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
-            {children}
-        </AuthContext.Provider>
-    );
+    const data = await res.json();
+
+    if (!res.ok) return { success: false, message: data.message };
+
+    localStorage.setItem("token", data.token);
+    localStorage.setItem("user", JSON.stringify(data.user));
+    setUser(data.user);
+
+    return { success: true };
+  };
+
+  const logout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    setUser(null);
+  };
+
+  return (
+    <AuthContext.Provider value={{ user, login, logout, isAuthenticated: !!user }}>
+      {children}
+    </AuthContext.Provider>
+  );
 }
 
-export function useAuth() {
-    return useContext(AuthContext);
-}
+export const useAuth = () => useContext(AuthContext);

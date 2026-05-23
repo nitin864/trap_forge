@@ -332,7 +332,7 @@ def run_demo_attacker():
     """
     import time
 
-    BROADCAST_LIMIT = 8
+    BROADCAST_LIMIT = 83
 
     demo_attacks = [
         (2222, "SSH",   "root",                                                                         "script_kiddie"),
@@ -408,7 +408,7 @@ async def startup():
         t.start()
 
     # FIX: target= was missing — demo attacker never ran before
-    demo_thread = threading.Thread(daemon=True)
+    demo_thread = threading.Thread(target=run_demo_attacker,daemon=True)
     demo_thread.start()
 
     print("[TrapForge] All honeypots active. Demo attacker running.")
@@ -417,4 +417,4 @@ async def startup():
 
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=False)
+    uvicorn.run("main:app", host="0.0.0.0", port=8001, reload=False)

@@ -690,7 +690,7 @@ function DeployCTA() {
                     style={{ display: "inline-block", fontFamily: "JetBrains Mono, monospace", fontSize: 12, background: "#111", border: "1px solid #2a2a2a", borderRadius: 40, padding: "10px 24px", color: GREEN, marginBottom: 32, cursor: "text", userSelect: "all", transition: "border-color 0.2s, box-shadow 0.2s" }}
                 >
                     <span style={{ color: "#6b7280" }}>$ </span>
-                    git clone https://github.com/yourrepo/trapforge &amp;&amp; cd trapforge &amp;&amp; python backend/main.py
+                    git clone https://github.com/nitin864/trap_forge &amp;&amp; cd trap_forge &amp;&amp; python backend/main.py  
                 </motion.div>
 
                 <br />

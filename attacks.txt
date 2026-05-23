@@ -35,7 +35,7 @@ curl -s http://localhost:8080/.env
 
 
 
-MySQL (port 3307)
+MySQL (port 3306)
 rlwrap nc -q 30 localhost 3306
 ```
 Then type:

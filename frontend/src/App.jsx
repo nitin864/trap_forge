@@ -11,8 +11,8 @@ import "./App.css";
 export const AttackContext = createContext(null);
 export function useAttacks() { return useContext(AttackContext); }
 
-const WS_URL = import.meta.env.VITE_WS_URL || "ws://localhost:8000/ws";
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+const WS_URL = import.meta.env.VITE_WS_URL || "ws://localhost:8001/ws";
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8001";
 export { API_URL };
 
 function generateAIRecommendations(attacks, stats) {
@@ -64,7 +64,7 @@ async function generatePDFReport(attacks, stats, triggerCount) {
   const kpis = [["TOTAL",attacks.length,[0,255,136]],["UNIQUE IPs",uniqueIPs,[51,170,255]],["CRITICAL",critCount,[255,51,51]],["HIGH",highCount,[255,170,0]]];
   const cW=(W-20)/4;
   kpis.forEach(([lbl,val,col],i)=>{
-    const cx=8+i*(cW+1.33);
+    const cx=8+i*(cW+1.33);9
     doc.setFillColor(15,21,32); doc.roundedRect(cx,y,cW,18,1.5,1.5,"F");
     doc.setDrawColor(...col); doc.setLineWidth(0.5); doc.roundedRect(cx,y,cW,18,1.5,1.5,"S");
     doc.setTextColor(...col); doc.setFontSize(16); doc.setFont("helvetica","bold"); doc.text(val.toString(),cx+cW/2,y+11,{align:"center"});
