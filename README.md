@@ -1,6 +1,5 @@
 # TrapForge 🪤🔥
-### AI-Powered Adaptive Honeypot — Forge the perfect trap — HACK-O-NiT 2026
-
+### AI-Powered Adaptive Honeypot — Forge the perfect trap  
 > A live cybersecurity system that lures attackers into fake services, classifies their intent using ML, generates deceptive responses using an LLM, and visualises everything on a real-time dashboard.
 
 ---
@@ -150,14 +149,7 @@ curl "http://localhost:8080/login?id=1' OR 1=1--"
 
 ---
 
-## Team Role Split
-
-| Member   | Module                              |
-|----------|-------------------------------------|
-| Member A | ML Classifier + training data       |
-| Member B | Deception Engine + LLM integration  |
-| Member C | React Dashboard + WebSocket UI      |
-| Member D | FastAPI backend + socket honeypots  |
+ 
 
 ---
 
