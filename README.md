@@ -84,7 +84,7 @@ npm run dev
 
 ---
 
-## Honeypot Ports (no root needed)
+## Honeypot Ports 
 
 | Port | Mimics  | Real Port |
 |------|---------|-----------|
