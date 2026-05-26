@@ -1,5 +1,6 @@
 # TrapForge 🪤🔥
-Live Demo: https://trapforge.vercel.app/
+Live Demo: https://trapforge.vercel.app/ (In our prototype, we are currently facing an issue with fetching live stats in chart and graph formats only in the deployed version, while everything works perfectly locally. We are actively working on fixing it. However, the core functionalities are working properly, including capturing hackers’ IP addresses, payloads, notifications, and other attack-related data in real time.
+)
 ### AI-Powered Adaptive Honeypot — Forge the perfect trap  
 > A live cybersecurity system that lures attackers into fake services, classifies their intent using ML, generates deceptive responses using an LLM, and visualises everything on a real-time dashboard.
 
