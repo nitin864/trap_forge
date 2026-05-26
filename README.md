@@ -6,7 +6,8 @@ Live Demo: https://trapforge.vercel.app/ (In our prototype, we are currently fac
 
 >Backend Deployed on AWS VPS and frontend on Vercel 
 ---
-
+![Dashboard](images/1.png)
+![Logs](images/2.png)
 ## What It Does
 
 ```
