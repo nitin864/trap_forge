@@ -112,7 +112,7 @@ class DeceptionEngine:
         return random.choice(options)
 
     def respond(self, command: str, service: str, intent: dict) -> str:
-        """Generate a deceptive response using LLM or fallback templates."""
+        
         if LLM_AVAILABLE:
             return self._llm_respond(command, service, intent)
         return self._template_respond(command, service, intent)
