@@ -136,17 +136,7 @@ curl "http://localhost:8080/login?id=1' OR 1=1--"
 | Realtime  | WebSocket broadcast                 |
 
 ---
-
-## Hackathon Pitch Script
-
-> "Most security tools try to stop attacks. TrapForge lets attacks in — on purpose.
-> 
-> Our AI honeypot mimics real servers. When an attacker connects, our ML model classifies their intent in real time — are they doing recon? Trying to steal credentials? Deploying malware? We map it to a MITRE ATT&CK technique.
->
-> Then our deception engine, powered by an LLM, sends back convincing fake data — keeping the attacker engaged while we log everything.
->
-> The result: a live threat intelligence feed that tells you *who* is attacking, *what* they want, and *how skilled* they are — all before they've done any real damage."
-
+ 
 ---
 
  
