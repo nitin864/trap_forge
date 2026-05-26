@@ -2,6 +2,7 @@
 ### AI-Powered Adaptive Honeypot — Forge the perfect trap  
 > A live cybersecurity system that lures attackers into fake services, classifies their intent using ML, generates deceptive responses using an LLM, and visualises everything on a real-time dashboard.
 
+>Backend Deployed on AWS VPS and frontend on Vercel 
 ---
 
 ## What It Does
