@@ -102,13 +102,14 @@ npm run dev
 | 3307 | MySQL   | 3306      |
 | 2525 | SMTP    | 25        |
 
-To test manually:
+To test it (43.205.138.66) --this is real public IP of our vps where backend is running:
 ```bash
 # Test SSH honeypot
-ssh root@localhost -p 2222
+nc 43.205.138.66 2222
+
 
 # Test FTP honeypot
-ftp localhost 2121
+nc 43.205.138.66 2121
 
 # Test HTTP honeypot
 curl http://localhost:8080/admin
