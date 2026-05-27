@@ -70,7 +70,7 @@ trapforge/
 ### 1. Backend
 
 ```bash
-cd trapforge/backend
+cd trap_forge/backend
 pip install -r requirements.txt
 
 # Add your Grok (xAI) API key for LLM-powered deception + threat narration
@@ -85,7 +85,7 @@ python main.py
 ### 2. Auth
 
 ```bash
-cd trapforge/auth-server
+cd trap_forge/auth-server
 npm install
 node server.js
  
@@ -94,7 +94,7 @@ node server.js
 ### 3. Frontend
 
 ```bash
-cd trapforge/frontend
+cd trap_forge/frontend
 npm install
 npm run dev
 # → Dashboard at http://localhost:3000
