@@ -78,10 +78,18 @@ export XAI_API_KEY=xai-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 python main.py
 # → API running at http://localhost:8000
 # → Honeypots: SSH:2222, FTP:2121, HTTP:8080, MySQL:3307, SMTP:2525
-# → Demo attacker simulating traffic automatically
+ 
+```
+### 2. Auth
+
+```bash
+cd trapforge/auth-server
+npm install
+node server.js
+ 
 ```
 
-### 2. Frontend
+### 3. Frontend
 
 ```bash
 cd trapforge/frontend
@@ -89,6 +97,8 @@ npm install
 npm run dev
 # → Dashboard at http://localhost:3000
 ```
+
+
 
 ---
 
