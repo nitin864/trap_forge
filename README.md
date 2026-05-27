@@ -113,7 +113,9 @@ nc 43.205.138.66 2121
 
 # Test HTTP honeypot
 curl http://localhost:8080/admin
-curl "http://localhost:8080/login?id=1' OR 1=1--"
+curl "http://localhost:8080/login?id=1' OR 1=1--"\
+
+after this check the event log it displays your IP, payload everything
 ```
 
 ---
