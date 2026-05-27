@@ -11,6 +11,10 @@ Live Demo: https://trapforge.vercel.app/ (In our prototype, we are currently fac
 ---
 ![Dashboard](images/1.png)
 ![Logs](images/2.png)
+![Logs](images/3.png)
+![Logs](images/4.png)
+![Logs](images/5.png)
+ 
 ## What It Does
 
 ```
