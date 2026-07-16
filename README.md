@@ -169,7 +169,7 @@ after this check the event log it displays your IP, payload everything
 
 ---
 
-## Judging Criteria Coverage
+## Judging Criteria coverage
 
 | Criterion          | How TrapForge covers it                          |
 |--------------------|--------------------------------------------------|
